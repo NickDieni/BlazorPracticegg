@@ -1,0 +1,118 @@
+﻿@page "/Library"
+@using BlazorPractice.Data
+@inject LibraryData LibraryService
+@inject NavigationManager uriHelper
+
+<h3>Library</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Author Id</th>
+            <th>Author Name</th>
+            <th>Borrowed</th>
+            <th>Borrower Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (books != null)
+        {
+            @foreach (Book book in books)
+            {
+                <tr>
+                    <td>@book.Id</td>
+                    <td>@book.Title</td>
+                    <td>@book.AuthorId</td>
+                    <td>@book.AuthorName</td>
+                    <td>@book.Borrow</td>
+                    <td>@book.Borrowname</td>
+                    <td><button class="btn btn-danger" @onclick="() => DeleteBook(book)">Delete Book</button></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+<div class="form-group">
+    <label for="title">Title:</label>
+    <input id="title" class="form-control" @bind="newBookTitle" />
+</div>
+
+<div class="form-group">
+    <label for="author">Author:</label>
+    <input id="author" class="form-control" @bind="newBookAuthor" />
+</div>
+
+<button class="btn btn-primary" @onclick="AddBook">Add Book</button>
+
+
+@code {
+    private string newBookTitle = "";
+    private string newBookAuthor = "";
+    private string deleteBookTittle = "";
+    private string deleteBookAuthor = "";
+
+
+    private async Task AddBook()
+    {
+        BuildConnectionString nyCon = new BuildConnectionString();
+        string cstring = nyCon.ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(cstring))
+        {
+            connection.Open();
+
+            // Insert the logic to add the new book to the database
+            string sqlQuery = $"INSERT INTO Books (Bookname, AuthorID) SELECT '{newBookTitle}', ID FROM Authors WHERE Authorname = '{newBookAuthor}'";
+
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                int rowsAffected = command.ExecuteNonQuery();
+            }
+
+            // After adding the book, you might want to clear the input fields
+            newBookTitle = "";
+            newBookAuthor = "";
+            connection.Close();
+            uriHelper.NavigateTo("/Library", forceLoad: true);
+        }
+    }
+
+    private async Task DeleteBook(Book book)
+    {
+        // Remove the book from the list first
+        books.Remove(book);
+
+        // Now delete the book from the database
+        BuildConnectionString nyCon = new BuildConnectionString();
+        string cstring = nyCon.ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(cstring))
+        {
+            connection.Open();
+
+            // Build and execute SQL query to delete the book with matching ID
+            string sqlQuery = $"DELETE FROM Books WHERE ID = {book.Id}";
+
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                int rowsAffected = command.ExecuteNonQuery();
+            }
+
+            connection.Close();
+            uriHelper.NavigateTo("/Library", forceLoad: true);
+        }
+    }
+
+}
+
+@code {
+    List<Book> books = new LibraryData().GetUsers();
+    private LibraryData[]? LibService;
+}
+
+
