@@ -49,13 +49,42 @@
 
 <button class="btn btn-primary" @onclick="AddBook">Add Book</button>
 
+<div class="form-group">
+    <label for="author">Author:</label>
+    <input id="author" class="form-control" @bind="newAuthor" />
+</div>
+
+
+<button class="btn btn-primary" @onclick="AddAuthor">Add Author</button>
 
 @code {
     private string newBookTitle = "";
     private string newBookAuthor = "";
+    private string newAuthor = "";
     private string deleteBookTittle = "";
     private string deleteBookAuthor = "";
 
+    private async Task AddAuthor()
+    {
+        BuildConnectionString nyCon = new BuildConnectionString();
+        string cstring = nyCon.ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(cstring))
+        {
+            connection.Open();
+
+            string sqlQuery = $"INSERT INTO Authors (Authorname) VALUES ('{newAuthor}')";
+
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                int rowsAffected = command.ExecuteNonQuery();
+            }
+
+            newAuthor = "";
+            connection.Close();
+            uriHelper.NavigateTo("/Library", forceLoad: true);
+        }
+    }
 
     private async Task AddBook()
     {
@@ -66,7 +95,6 @@
         {
             connection.Open();
 
-            // Insert the logic to add the new book to the database
             string sqlQuery = $"INSERT INTO Books (Bookname, AuthorID) SELECT '{newBookTitle}', ID FROM Authors WHERE Authorname = '{newBookAuthor}'";
 
             using (SqlCommand command = new SqlCommand(sqlQuery, connection))
@@ -74,7 +102,6 @@
                 int rowsAffected = command.ExecuteNonQuery();
             }
 
-            // After adding the book, you might want to clear the input fields
             newBookTitle = "";
             newBookAuthor = "";
             connection.Close();
@@ -84,10 +111,8 @@
 
     private async Task DeleteBook(Book book)
     {
-        // Remove the book from the list first
         books.Remove(book);
 
-        // Now delete the book from the database
         BuildConnectionString nyCon = new BuildConnectionString();
         string cstring = nyCon.ConnectionString;
 
@@ -95,7 +120,6 @@
         {
             connection.Open();
 
-            // Build and execute SQL query to delete the book with matching ID
             string sqlQuery = $"DELETE FROM Books WHERE ID = {book.Id}";
 
             using (SqlCommand command = new SqlCommand(sqlQuery, connection))
