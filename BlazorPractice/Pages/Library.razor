@@ -74,7 +74,6 @@
             connection.Open();
 
             string sqlQuery = $"INSERT INTO Authors (Authorname) VALUES ('{newAuthor}')";
-
             using (SqlCommand command = new SqlCommand(sqlQuery, connection))
             {
                 int rowsAffected = command.ExecuteNonQuery();
@@ -82,7 +81,6 @@
 
             newAuthor = "";
             connection.Close();
-            uriHelper.NavigateTo("/Library", forceLoad: true);
         }
     }
 

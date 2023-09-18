@@ -14,6 +14,9 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<LibraryData>();
+        builder.Services.AddSingleton<Holidata>();
+         
+
 
 
         var app = builder.Build();

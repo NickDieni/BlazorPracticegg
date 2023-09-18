@@ -1,0 +1,35 @@
+﻿@page "/Holiday"
+@using BlazorPractice.Data
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject Holidata Holidata
+@inject NavigationManager uriHelper
+
+<h3>Holidays and People</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Local Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (PublicHoliday holiday in holidays)
+        {
+            <tr>
+                <td>@holiday.Date</td>
+                <td>@holiday.LocalName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private PublicHoliday[] holidays = new PublicHoliday[0];
+    protected override async Task OnInitializedAsync()
+    {   
+        holidays = await Holidata.HoliAsync();
+    }
+}
+$

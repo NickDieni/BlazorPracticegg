@@ -11,5 +11,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="NavigationManagerUtils" Version="0.0.1" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+    <PackageReference Include="JSconsoleExtensionsLib" Version="5.0.2" />
+    <PackageReference Include="Nager.Holiday" Version="1.0.1" />
   </ItemGroup>
 </Project>
