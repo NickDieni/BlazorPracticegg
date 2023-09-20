@@ -1,0 +1,6 @@
+CREATE TABLE Birthday
+(
+    ID INT PRIMARY KEY IDENTITY(1,1), 
+    Name NVARCHAR(255), 
+    DateColumn DATE 
+);
