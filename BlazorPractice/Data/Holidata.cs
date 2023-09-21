@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text.Json;
+using BlazorPractice.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace BlazorPractice.Data
 {
     public class Holidata
@@ -23,8 +26,25 @@ namespace BlazorPractice.Data
 
     public class PublicHoliday
     {
-        public DateTime Date { get; set; }
-        public string LocalName { get; set; }
+        public DateTime? Date { get; set; }
+        public string? LocalName { get; set; }
     }
+
+    public class User
+    {
+        public int ID { get; set; } 
+        public string?  Name1 { get; set; }
+        public DateTime Datecollum { get; set; }
+    }
+
+    public class AppDbContext : DbContext
+    {
+        public DbSet<User> Birthday { get; set; }
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+    }
+    
 }
 

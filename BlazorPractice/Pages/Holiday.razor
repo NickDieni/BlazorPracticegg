@@ -3,33 +3,121 @@
 @using System.Net.Http
 @using System.Net.Http.Json
 @inject Holidata Holidata
+@inject AppDbContext DbContext
 @inject NavigationManager uriHelper
 
-<h3>Holidays and People</h3>
 
-<table>
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Local Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (PublicHoliday holiday in holidays)
-        {
+<h3>Holidays</h3>
+
+<div>
+    <label>
+        <input type="radio" name="selection" value="Holidays" @onchange="HandleSelection1" checked> Holidays
+    </label>
+    <label>
+        <input type="radio" name="selection" value="Birthdays" @onchange="HandleSelection1"> Birthdays
+    </label>
+</div>
+@if (selectedDate == "Holidays")
+{
+    <p>You selected Holidays.</p>
+
+    <table class="table">
+        <thead>
             <tr>
-                <td>@holiday.Date</td>
-                <td>@holiday.LocalName</td>
+                <th>Date</th>
+                <th>Local Name</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (PublicHoliday holiday in holidays)
+            {
+                <tr>
+                    <td>@holiday.Date</td>
+                    <td>@holiday.LocalName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (selectedDate == "Birthdays")
+{
+    <p>You selected Birthdays.</p>
+}
+
+
+<div>
+    <label>
+        <input type="radio" name="selection" value="entity-framework" @onchange="HandleSelection"> Entity Framework
+    </label>
+    <label>
+        <input type="radio" name="selection" value="angular" @onchange="HandleSelection"> Angular
+    </label>
+    <label>
+        <input type="radio" name="selection" value="crud" @onchange="HandleSelection"> CRUD
+    </label>
+</div>
+
+@if (selectedOption == "entity-framework")
+{
+    <p>You selected Entity Framework.</p>
+    <form @onsubmit="AddUser">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" @bind="userName" />
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Birth Date:</label>
+            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
+        </div>
+        <button type="submit" class="btn btn-primary">Add User</button>
+    </form>
+}
+else if (selectedOption == "angular")
+{
+    <p>You selected Angular.</p>
+}
+else if (selectedOption == "crud")
+{
+    <p>You selected CRUD.</p>
+}
+
+
+@code{
+    private string? userName;
+    private DateTime userBirthDate;
+
+    private async Task AddUser()
+    {
+        var user = new User
+        {
+            Name1 = userName, 
+            Datecollum = userBirthDate 
+        };
+
+        DbContext.Birthday.Add(user);
+        await DbContext.SaveChangesAsync();
+
+        userName = string.Empty;
+        userBirthDate = DateTime.Now;
+    }
+}
 
 @code {
     private PublicHoliday[] holidays = new PublicHoliday[0];
+    private string selectedOption = "";
+    private string selectedDate = "";
+
+
     protected override async Task OnInitializedAsync()
-    {   
+    {
         holidays = await Holidata.HoliAsync();
     }
+    private void HandleSelection(ChangeEventArgs e)
+    {
+        selectedOption = e.Value.ToString();
+    }
+    private void HandleSelection1(ChangeEventArgs e)
+    {
+        selectedDate = e.Value.ToString();
+    }
 }
-$
