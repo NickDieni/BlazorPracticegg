@@ -1,6 +1,6 @@
 CREATE TABLE Birthday
 (
     ID INT PRIMARY KEY IDENTITY(1,1), 
-    Name NVARCHAR(255), 
-    DateColumn DATE 
+    Name1 NVARCHAR(255), 
+    Datecolumn DATE 
 );
