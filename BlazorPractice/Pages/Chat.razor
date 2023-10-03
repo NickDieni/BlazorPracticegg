@@ -1,0 +1,37 @@
+﻿@page "/Chat"
+@using BlazorPractice.Data
+
+<PageTitle>Chat</PageTitle>
+
+<h1>Chat Room</h1>
+
+<div class="chat-container">
+    <div class="messages">
+        @foreach (var message in chatMessages)
+        {
+            <div class="message">@message.Content</div>
+        }
+    </div>
+    <div class="input">
+        <input type="text" @bind="newMessage" placeholder="Type a message..." />
+        <button @onclick="SendMessage">Send</button>
+    </div>
+</div>
+
+@code {
+    private string newMessage;
+    private List<ChatMessage> chatMessages = new List<ChatMessage>();
+
+    private void SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(newMessage))
+        {
+            chatMessages.Add(new ChatMessage
+                {
+                    Content = newMessage,
+                    Timestamp = DateTime.Now
+                });
+            newMessage = string.Empty;
+        }
+    }
+}
