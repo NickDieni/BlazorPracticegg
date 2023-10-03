@@ -11,7 +11,7 @@
 
 <div>
     <label>
-        <input type="radio" name="selection" value="Holidays" @onchange="HandleSelection1" checked> Holidays
+        <input type="radio" name="selection" value="Holidays" @onchange="HandleSelection1"> Holidays
     </label>
     <label>
         <input type="radio" name="selection" value="Birthdays" @onchange="HandleSelection1"> Birthdays
@@ -42,15 +42,37 @@
 else if (selectedDate == "Birthdays")
 {
     <p>You selected Birthdays.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Function</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (GetBirthdays != null)
+            {
+                @foreach (User Userdd in GetBirthdays)
+                {
+                    <tr>
+                        <td>@Userdd.ID</td>
+                        <td>@Userdd.Name1</td>
+                        <td>@Userdd.Datecollum</td>
+                        <td><button class="btn btn-danger" @onclick="() => DeleteUser(Userdd)">Delete Date</button></td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
 }
 
 
 <div>
     <label>
         <input type="radio" name="selection" value="entity-framework" @onchange="HandleSelection"> Entity Framework
-    </label>
-    <label>
-        <input type="radio" name="selection" value="angular" @onchange="HandleSelection"> Angular
     </label>
     <label>
         <input type="radio" name="selection" value="crud" @onchange="HandleSelection"> CRUD
@@ -60,7 +82,7 @@ else if (selectedDate == "Birthdays")
 @if (selectedOption == "entity-framework")
 {
     <p>You selected Entity Framework.</p>
-    <form @onsubmit="AddUser">
+    <form @onsubmit="AddUserEntity">
         <div class="form-group">
             <label for="name">Name:</label>
             <input type="text" class="form-control" id="name" @bind="userName" />
@@ -72,13 +94,20 @@ else if (selectedDate == "Birthdays")
         <button type="submit" class="btn btn-primary">Add User</button>
     </form>
 }
-else if (selectedOption == "angular")
-{
-    <p>You selected Angular.</p>
-}
 else if (selectedOption == "crud")
 {
     <p>You selected CRUD.</p>
+    <form @onsubmit="AddUserCrud">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" @bind="userName" />
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Birth Date:</label>
+            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
+        </div>
+        <button type="submit" class="btn btn-primary">Add User</button>
+    </form>
 }
 
 
@@ -86,12 +115,12 @@ else if (selectedOption == "crud")
     private string? userName;
     private DateTime userBirthDate;
 
-    private async Task AddUser()
+    private async Task AddUserEntity()
     {
         var user = new User
         {
-            Name1 = userName, 
-            Datecollum = userBirthDate 
+            Name1 = userName,
+            Datecollum = userBirthDate
         };
 
         DbContext.Birthday.Add(user);
@@ -100,22 +129,74 @@ else if (selectedOption == "crud")
         userName = string.Empty;
         userBirthDate = DateTime.Now;
     }
+    private async Task AddUserCrud()
+    {
+        BuildConnectionString nyCon = new BuildConnectionString();
+        string cstring = nyCon.ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(cstring))
+        {
+            connection.Open();
+
+            string sqlQuery = "INSERT INTO Birthday (Name1, Datecollum) VALUES (@Name1, @Datecollum)";
+
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                command.Parameters.AddWithValue("@Name1", userName);
+                command.Parameters.AddWithValue("@Datecollum", userBirthDate);
+
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+            }
+
+            connection.Close();
+
+            userName = string.Empty;
+            userBirthDate = DateTime.Now;
+        }
+    }
+
+    private async Task DeleteUser(User Userdd)
+    {
+        GetBirthdays.Remove(Userdd);
+
+        BuildConnectionString nyCon = new BuildConnectionString();
+        string cstring = nyCon.ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(cstring))
+        {
+            connection.Open();
+
+            string sqlQuery = $"DELETE FROM Birthday WHERE ID = {Userdd.ID}";
+
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                int rowsAffected = command.ExecuteNonQuery();
+            }
+
+            connection.Close();
+            uriHelper.NavigateTo("/Holiday", forceLoad: true);
+        }
+    }
 }
 
 @code {
     private PublicHoliday[] holidays = new PublicHoliday[0];
     private string selectedOption = "";
     private string selectedDate = "";
-
+    private List<User> birthdaysList = new List<User>(); // Rename the variable
+    List<User> GetBirthdays = new Holidata().GetBirthdays();
+    private Holidata[]? Holidatas;
 
     protected override async Task OnInitializedAsync()
     {
         holidays = await Holidata.HoliAsync();
     }
+
     private void HandleSelection(ChangeEventArgs e)
     {
         selectedOption = e.Value.ToString();
     }
+
     private void HandleSelection1(ChangeEventArgs e)
     {
         selectedDate = e.Value.ToString();

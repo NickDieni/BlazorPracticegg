@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Text.Json;
 using BlazorPractice.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data.SqlClient;
+
 
 namespace BlazorPractice.Data
 {
@@ -22,7 +24,43 @@ namespace BlazorPractice.Data
             }
             return new PublicHoliday[0];
         }
-	}
+
+
+        public List<User> GetBirthdays()
+        {
+            BuildConnectionString nyCon = new BuildConnectionString();
+            string cstring = nyCon.ConnectionString;
+
+
+            List<User> ListUser = new List<User>();
+
+            using (SqlConnection con = new SqlConnection(cstring))
+            {
+                con.Open();
+
+                string sqlQuery2 = "SELECT * FROM Birthday";
+
+                using (SqlCommand command = new SqlCommand(sqlQuery2, con))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            User Userdd = new User
+                            {
+                                ID = Convert.ToInt32(reader["ID"]),
+                                Name1 = reader["Name1"].ToString(),
+                                Datecollum = (DateTime)reader["Datecollum"]
+                            };
+                            ListUser.Add(Userdd);
+                        }
+                    }
+                }
+                con.Close();
+            }
+            return ListUser;
+        }
+    }
 
     public class PublicHoliday
     {
