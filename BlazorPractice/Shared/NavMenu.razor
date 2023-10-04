@@ -1,4 +1,4 @@
-﻿    <div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">BlazorPractice</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -29,9 +29,13 @@
                 <span class="oi oi-spreadsheet" aria-hidden="true"></span> Holiday
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/Chat">
+                <span class="oi oi-spreadsheet" aria-hidden="true"></span> Chat
+            </NavLink>
+        </div>
     </nav>
 </div>
-
 
 @code {
     private bool collapseNavMenu = true;
