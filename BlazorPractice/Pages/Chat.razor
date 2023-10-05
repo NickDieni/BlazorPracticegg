@@ -1,11 +1,12 @@
 ﻿@page "/Chat"
 @using BlazorPractice.Data
+@inject ChatDbContext dbContext
 
 <PageTitle>Chat</PageTitle>
 
 <h1>Chat Room</h1>
 
-<div class="chat-container">
+<div class="chat-container"     >
     <div class="messages">
         @foreach (var message in chatMessages)
         {
@@ -20,17 +21,33 @@
 
 @code {
     private string newMessage;
-    private List<ChatMessage> chatMessages = new List<ChatMessage>();
+    private List<ChatMessage> chatMessages = new();
+
+    protected override void OnInitialized()
+    {
+        chatMessages = GetMessage();
+    }
+
+    private List<ChatMessage> GetMessage()
+    {
+        return dbContext.ChatMessages.ToList();
+    }
 
     private void SendMessage()
     {
         if (!string.IsNullOrWhiteSpace(newMessage))
         {
-            chatMessages.Add(new ChatMessage
-                {
-                    Content = newMessage,
-                    Timestamp = DateTime.Now
-                });
+            var message = new ChatMessage
+            {
+                Content = newMessage,
+                Timestamp = DateTime.Now
+            };
+
+            dbContext.ChatMessages.Add(message);
+            dbContext.SaveChanges();
+
+            chatMessages.Add(message);
+
             newMessage = string.Empty;
         }
     }

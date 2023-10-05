@@ -33,7 +33,10 @@ public class Program
         {
             options.UseSqlServer(connectionString); // Use the connection string from configuration
         });
-
+        builder.Services.AddDbContext<ChatDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString); // Use the connection string from configuration
+        });
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
