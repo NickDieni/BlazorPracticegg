@@ -1,0 +1,29 @@
+﻿@page "/rps"
+@using BlazorPractice.Data
+
+<h3>RPS</h3>
+
+<div>
+    <p>Select your move:</p>
+    <button @onclick="() => Play(Rock)">Rock</button>
+    <button @onclick="() => Play(Paper)">Paper</button>
+    <button @onclick="() => Play(Scissors)">Scissors</button>
+</div>
+    
+<div>
+    <p>Computer chose: @gameData.ComputerChoice</p>
+    <p>Result: @gameData.GameResult</p>
+</div>
+
+@code {
+    private string Rock = "Rock";
+    private string Paper = "Paper";
+    private string Scissors = "Scissors";
+
+    private RPSdata gameData = new RPSdata();
+
+     private void Play(string choice)
+    {
+        gameData.PlayGame(choice);
+    }
+}
