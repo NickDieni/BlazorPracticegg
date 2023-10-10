@@ -4,12 +4,12 @@ namespace BlazorPractice.Data
 {
     public class RPSdata
     {
-        public string ComputerChoice { get; private set; }
+        public RPSenum ComputerChoice { get; private set; }
         public string GameResult { get; private set; }
 
         private Random random = new Random();
 
-        public void PlayGame(string choice)
+        public void PlayGame(RPSenum choice)
         {
             // Generate computer's choice randomly
             int computerRandom = random.Next(1, 4);
@@ -18,13 +18,13 @@ namespace BlazorPractice.Data
             switch (computerRandom)
             {
                 case 1:
-                    ComputerChoice = "Rock";
+                    ComputerChoice = RPSenum.Rock;
                     break;
                 case 2:
-                    ComputerChoice = "Paper";
+                    ComputerChoice = RPSenum.Paper;
                     break;
                 case 3:
-                    ComputerChoice = "Scissors";
+                    ComputerChoice = RPSenum.Scissors;
                     break;
             }
 
@@ -33,9 +33,9 @@ namespace BlazorPractice.Data
             {
                 GameResult = "It's a tie!";
             }
-            else if ((choice == "Rock" && ComputerChoice == "Scissors") ||
-                     (choice == "Paper" && ComputerChoice == "Rock") ||
-                     (choice == "Scissors" && ComputerChoice == "Paper"))
+            else if ((choice == RPSenum.Rock && ComputerChoice == RPSenum.Scissors) ||
+                     (choice == RPSenum.Paper && ComputerChoice == RPSenum.Rock) ||
+                     (choice == RPSenum.Scissors && ComputerChoice == RPSenum.Paper))
             {
                 GameResult = "You win!";
             }
@@ -44,5 +44,12 @@ namespace BlazorPractice.Data
                 GameResult = "Computer wins!";
             }
         }
+    }
+
+    public enum RPSenum
+    {
+        Rock,
+        Paper,
+        Scissors
     }
 }

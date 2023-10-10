@@ -5,9 +5,9 @@
 
 <div>
     <p>Select your move:</p>
-    <button @onclick="() => Play(Rock)">Rock</button>
-    <button @onclick="() => Play(Paper)">Paper</button>
-    <button @onclick="() => Play(Scissors)">Scissors</button>
+    <button @onclick="() => Play(RPSenum.Rock)">Rock</button>
+    <button @onclick="() => Play(RPSenum.Paper)">Paper</button>
+    <button @onclick="() => Play(RPSenum.Scissors)">Scissors</button>
 </div>
     
 <div>
@@ -16,13 +16,9 @@
 </div>
 
 @code {
-    private string Rock = "Rock";
-    private string Paper = "Paper";
-    private string Scissors = "Scissors";
+     private RPSdata gameData = new RPSdata();
 
-    private RPSdata gameData = new RPSdata();
-
-     private void Play(string choice)
+     private void Play(RPSenum choice)
     {
         gameData.PlayGame(choice);
     }

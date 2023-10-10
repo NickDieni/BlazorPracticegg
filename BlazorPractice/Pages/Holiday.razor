@@ -37,7 +37,8 @@
                 </tr>
             }
         </tbody>
-    </table>    
+    </table>
+
 }
 else if (selectedDate == "Birthdays")
 {
@@ -75,13 +76,14 @@ else if (selectedDate == "Birthdays")
         <input type="radio" name="selection" value="entity-framework" @onchange="HandleSelection"> Entity Framework
     </label>
     <label>
-        <input type="radio" name="selection" value="crud" @onchange="HandleSelection"> CRUD
+        <input type="radio" name="selection" value="crud" @onchange="HandleSelection"> SQL Connection
     </label>
 </div>
 
 @if (selectedOption == "entity-framework")
 {
     <p>You selected Entity Framework.</p>
+    <p>Create</p>
     <form @onsubmit="AddUserEntity">
         <div class="form-group">
             <label for="name">Name:</label>
@@ -93,11 +95,29 @@ else if (selectedDate == "Birthdays")
         </div>
         <button type="submit" class="btn btn-primary">Add User</button>
     </form>
+
+    <p>UPDATE.</p>
+    <form @onsubmit="UpdateUserEntity">
+        <div class="form-group">
+            <label for="id">ID:</label>
+            <input type="text" class="form-control" id="id" @bind="userID" />
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" @bind="userName" />
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Birth Date:</label>
+            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
+        </div>
+        <button type="submit" class="btn btn-primary">Update User</button>
+    </form>
 }
 else if (selectedOption == "crud")
 {
-    <p>You selected CRUD.</p>
+    <p>You selected SQL Connection.</p>
     <form @onsubmit="AddUserCrud">
+
         <div class="form-group">
             <label for="name">Name:</label>
             <input type="text" class="form-control" id="name" @bind="userName" />
@@ -112,6 +132,7 @@ else if (selectedOption == "crud")
 
 
 @code{
+    private int userID;
     private string? userName;
     private DateTime userBirthDate;
 
@@ -129,6 +150,21 @@ else if (selectedOption == "crud")
         userName = string.Empty;
         userBirthDate = DateTime.Now;
     }
+    private async Task UpdateUserEntity()
+    {
+        var user = new User
+        {
+            ID = userID,
+            Name1 = userName,
+            Datecollum = userBirthDate
+        };
+        DbContext.Birthday.Update(user);
+        await DbContext.SaveChangesAsync();
+
+        userName = string.Empty;
+        userBirthDate = DateTime.Now;
+    }
+
     private async Task AddUserCrud()
     {
         BuildConnectionString nyCon = new BuildConnectionString();
