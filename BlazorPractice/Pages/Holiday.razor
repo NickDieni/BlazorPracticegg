@@ -1,9 +1,14 @@
 ﻿@page "/Holiday"
 @using BlazorPractice.Data
+@using BlazorPractice.Data.Crud
+@using BlazorPractice.Data.Models
 @using System.Net.Http
 @using System.Net.Http.Json
 @inject Holidata Holidata
 @inject AppDbContext DbContext
+@inject AdoCrud adoCrud 
+@inject EntityCrud entityCrud
+@inject UserModel userModel
 @inject NavigationManager uriHelper
 
 
@@ -11,10 +16,10 @@
 
 <div>
     <label>
-        <input type="radio" name="selection" value="Holidays" @onchange="HandleSelection1"> Holidays
+        <input type="radio" name="selection1" value="Holidays" @onchange="HandleSelection1"> Holidays
     </label>
     <label>
-        <input type="radio" name="selection" value="Birthdays" @onchange="HandleSelection1"> Birthdays
+        <input type="radio" name="selection1" value="Birthdays" @onchange="HandleSelection1"> Birthdays
     </label>
 </div>
 @if (selectedDate == "Holidays")
@@ -60,7 +65,7 @@ else if (selectedDate == "Birthdays")
                     <tr>
                         <td>@Userdd.ID</td>
                         <td>@Userdd.Name1</td>
-                        <td>@Userdd.Datecollum</td>
+                        <td>@Userdd.Datecollum.ToString("dd-MM-yyyy")</td>
                         <td><button class="btn btn-danger" @onclick="() => DeleteUser(Userdd)">Delete Date</button></td>
 
                     </tr>
@@ -79,159 +84,64 @@ else if (selectedDate == "Birthdays")
         <input type="radio" name="selection" value="crud" @onchange="HandleSelection"> SQL Connection
     </label>
 </div>
-
-@if (selectedOption == "entity-framework")
+@if (selectedOption == "entity-framework" || selectedOption == "crud")
 {
-    <p>You selected Entity Framework.</p>
+    <p>You selected @selectedOption</p>
     <p>Create</p>
-    <form @onsubmit="AddUserEntity">
+    <form @onsubmit="CreateUser">
         <div class="form-group">
             <label for="name">Name:</label>
-            <input type="text" class="form-control" id="name" @bind="userName" />
+            <input type="text" class="form-control" id="name" @bind="userModel.Name1" />
         </div>
         <div class="form-group">
             <label for="birthDate">Birth Date:</label>
-            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
+            <input type="date" class="form-control" id="birthDate" @bind="userModel.Datecollum" />
         </div>
         <button type="submit" class="btn btn-primary">Add User</button>
     </form>
 
     <p>UPDATE.</p>
-    <form @onsubmit="UpdateUserEntity">
+    <form @onsubmit="UpdateUser">
         <div class="form-group">
             <label for="id">ID:</label>
-            <input type="text" class="form-control" id="id" @bind="userID" />
+            <input type="text" class="form-control" id="id" @bind="userModel.ID" />
         </div>
         <div class="form-group">
             <label for="name">Name:</label>
-            <input type="text" class="form-control" id="name" @bind="userName" />
+            <input type="text" class="form-control" id="name" @bind="userModel.Name1" />
         </div>
         <div class="form-group">
             <label for="birthDate">Birth Date:</label>
-            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
+            <input type="date" class="form-control" id="birthDate" @bind="userModel.Datecollum" />
         </div>
         <button type="submit" class="btn btn-primary">Update User</button>
     </form>
 }
-else if (selectedOption == "crud")
-{
-    <p>You selected SQL Connection.</p>
-    <p>Create</p>
-    <form @onsubmit="AddUserCrud">
 
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" class="form-control" id="name" @bind="userName" />
-        </div>
-        <div class="form-group">
-            <label for="birthDate">Birth Date:</label>
-            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
-        </div>
-        <button type="submit" class="btn btn-primary">Add User</button>
-    </form>
-    <p>Update</p>
-    <form @onsubmit="UpdateUserCrud">
-        <div class="form-group">
-            <label for="id">ID:</label>
-            <input type="text" class="form-control" id="id" @bind="userID" />
-        </div>
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" class="form-control" id="name" @bind="userName" />
-        </div>
-        <div class="form-group">
-            <label for="birthDate">Birth Date:</label>
-            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
-        </div>
-        <button type="submit" class="btn btn-primary">Update User</button>
-    </form>
-}
 
 
 @code{
     private int userID;
     private string? userName;
-    private DateTime userBirthDate;
+    private DateTime userBirthDate = DateTime.Now;
 
-    private async Task AddUserEntity()
+    private void CreateUser()
     {
-        var user = new User
-        {
-            Name1 = userName,
-            Datecollum = userBirthDate
-        };
-
-        DbContext.Birthday.Add(user);
-        await DbContext.SaveChangesAsync();
-
-        userName = string.Empty;
-        userBirthDate = DateTime.Now;
+        if (selectedOption == "entity-framework")
+            entityCrud.Create(userModel);
+        else if (selectedOption == "crud")
+            adoCrud.Create(userModel);
     }
-    private async Task UpdateUserEntity()
+    private void UpdateUser()
     {
-        var user = new User
-        {
-            ID = userID,
-            Name1 = userName,
-            Datecollum = userBirthDate
-        };
-        DbContext.Birthday.Update(user);
-        await DbContext.SaveChangesAsync();
+        if (selectedOption == "entity-framework")
+            entityCrud.Update(userModel);
+        else if (selectedOption == "crud")
+            adoCrud.Update(userModel);
 
-        userName = string.Empty;
-        userBirthDate = DateTime.Now;
     }
 
-    private async Task AddUserCrud()
-    {
-        BuildConnectionString nyCon = new BuildConnectionString();
-        string cstring = nyCon.ConnectionString;
 
-        using (SqlConnection connection = new SqlConnection(cstring))
-        {
-            connection.Open();
-
-            string sqlQuery = "INSERT INTO Birthday (Name1, Datecollum) VALUES (@Name1, @Datecollum)";
-
-            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
-            {
-                command.Parameters.AddWithValue("@Name1", userName);
-                command.Parameters.AddWithValue("@Datecollum", userBirthDate);
-
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-            }
-
-            connection.Close();
-
-            userName = string.Empty;
-            userBirthDate = DateTime.Now;
-        }
-    }
-    private async Task UpdateUserCrud()
-    {
-        BuildConnectionString nyCon = new BuildConnectionString();
-        string cstring = nyCon.ConnectionString;
-
-        using (SqlConnection connection = new SqlConnection(cstring))
-        {
-            connection.Open();
-
-            string sqlQuery = $"UPDATE Birthday SET Name1 = @Name1, Datecollum = @Datecollum WHERE ID = {userID}";
-
-            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
-            {
-                command.Parameters.AddWithValue("@Name1", userName);
-                command.Parameters.AddWithValue("@Datecollum", userBirthDate);
-
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-            }
-
-            connection.Close();
-
-            userName = string.Empty;
-            userBirthDate = DateTime.Now;
-        }
-    }
 
     private async Task DeleteUser(User Userdd)
     {
@@ -252,7 +162,7 @@ else if (selectedOption == "crud")
             }
 
             connection.Close();
-            uriHelper.NavigateTo("/Holiday", forceLoad: true);
+            uriHelper.NavigateTo("/Holiday", true);
         }
     }
 }

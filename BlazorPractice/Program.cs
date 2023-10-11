@@ -5,6 +5,8 @@ using BlazorPractice.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using BlazorPractice.Data.Crud;
+using BlazorPractice.Data.Models;
 
 namespace BlazorPractice;
 
@@ -19,6 +21,9 @@ public class Program
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<LibraryData>();
         builder.Services.AddSingleton<Holidata>();
+        builder.Services.AddScoped<AdoCrud>();
+        builder.Services.AddScoped<EntityCrud>();
+        builder.Services.AddScoped<UserModel>();
 
         // Configuration setup
         var configuration = new ConfigurationBuilder()
@@ -34,6 +39,10 @@ public class Program
             options.UseSqlServer(connectionString); // Use the connection string from configuration
         });
         builder.Services.AddDbContext<ChatDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString); // Use the connection string from configuration
+        });
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseSqlServer(connectionString); // Use the connection string from configuration
         });
