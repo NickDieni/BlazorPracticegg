@@ -116,6 +116,7 @@ else if (selectedDate == "Birthdays")
 else if (selectedOption == "crud")
 {
     <p>You selected SQL Connection.</p>
+    <p>Create</p>
     <form @onsubmit="AddUserCrud">
 
         <div class="form-group">
@@ -127,6 +128,22 @@ else if (selectedOption == "crud")
             <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
         </div>
         <button type="submit" class="btn btn-primary">Add User</button>
+    </form>
+    <p>Update</p>
+    <form @onsubmit="UpdateUserCrud">
+        <div class="form-group">
+            <label for="id">ID:</label>
+            <input type="text" class="form-control" id="id" @bind="userID" />
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" @bind="userName" />
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Birth Date:</label>
+            <input type="date" class="form-control" id="birthDate" @bind="userBirthDate" />
+        </div>
+        <button type="submit" class="btn btn-primary">Update User</button>
     </form>
 }
 
@@ -175,6 +192,31 @@ else if (selectedOption == "crud")
             connection.Open();
 
             string sqlQuery = "INSERT INTO Birthday (Name1, Datecollum) VALUES (@Name1, @Datecollum)";
+
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                command.Parameters.AddWithValue("@Name1", userName);
+                command.Parameters.AddWithValue("@Datecollum", userBirthDate);
+
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+            }
+
+            connection.Close();
+
+            userName = string.Empty;
+            userBirthDate = DateTime.Now;
+        }
+    }
+    private async Task UpdateUserCrud()
+    {
+        BuildConnectionString nyCon = new BuildConnectionString();
+        string cstring = nyCon.ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(cstring))
+        {
+            connection.Open();
+
+            string sqlQuery = $"UPDATE Birthday SET Name1 = @Name1, Datecollum = @Datecollum WHERE ID = {userID}";
 
             using (SqlCommand command = new SqlCommand(sqlQuery, connection))
             {
