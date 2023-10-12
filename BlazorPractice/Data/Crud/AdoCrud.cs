@@ -1,5 +1,6 @@
 ﻿using System;
 using BlazorPractice.Data.Models;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorPractice.Data.Crud
@@ -30,16 +31,53 @@ namespace BlazorPractice.Data.Crud
                 connection.Close();
             }
         }
-        public void Delete()
+        public void Delete(int user)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(cString))
+            {
+                connection.Open();
+
+                string sqlQuery = $"DELETE FROM Birthday WHERE ID = {user}";
+
+                using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
         }
 
-        public void Read()
+        public List<UserModel> Read(UserModel user)
         {
-            throw new NotImplementedException();
-        }
+            List<UserModel> userList = new List<UserModel>();
 
+            using (SqlConnection con = new SqlConnection(cString))
+            {
+                con.Open();
+
+                string sqlQuery2 = "SELECT * FROM Birthday";
+
+                using (SqlCommand command = new SqlCommand(sqlQuery2, con))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            UserModel userModel = new UserModel
+                            {
+                                ID = Convert.ToInt32(reader["ID"]),
+                                Name1 = reader["Name1"].ToString(),
+                                Datecollum = (DateTime)reader["Datecollum"]
+                            };
+                            userList.Add(userModel);
+                        }
+                    }
+                }
+                con.Close();
+            }
+            return userList;
+        }
         public void Update(UserModel user)
         {
             using (SqlConnection connection = new SqlConnection(cString))

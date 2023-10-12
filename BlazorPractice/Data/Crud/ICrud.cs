@@ -6,9 +6,9 @@ namespace BlazorPractice.Data
 	public interface ICrud
 	{
 		void Create(UserModel user);
-		void Read();
+        List<UserModel> Read(UserModel user);
 		void Update(UserModel user);
-		void Delete();
+		void Delete(int user);
 	}
 }
 

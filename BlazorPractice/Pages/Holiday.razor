@@ -5,7 +5,6 @@
 @using System.Net.Http
 @using System.Net.Http.Json
 @inject Holidata Holidata
-@inject AppDbContext DbContext
 @inject AdoCrud adoCrud 
 @inject EntityCrud entityCrud
 @inject UserModel userModel
@@ -35,12 +34,12 @@
         </thead>
         <tbody>
             @foreach (PublicHoliday holiday in holidays)
-            {
+                {
                 <tr>
                     <td>@holiday.Date</td>
                     <td>@holiday.LocalName</td>
                 </tr>
-            }
+                }
         </tbody>
     </table>
 
@@ -58,19 +57,18 @@ else if (selectedDate == "Birthdays")
             </tr>
         </thead>
         <tbody>
-            @if (GetBirthdays != null)
-            {
-                @foreach (User Userdd in GetBirthdays)
-                {
+            
+                @foreach (UserModel user in userModels)
+                    {
                     <tr>
-                        <td>@Userdd.ID</td>
-                        <td>@Userdd.Name1</td>
-                        <td>@Userdd.Datecollum.ToString("dd-MM-yyyy")</td>
-                        <td><button class="btn btn-danger" @onclick="() => DeleteUser(Userdd)">Delete Date</button></td>
+                        <td>@user.ID</td>
+                        <td>@user.Name1</td>
+                        <td>@user.Datecollum.ToString("dd-MM-yyyy")</td>
+                        <td><button class="btn btn-danger" @onclick="() => DeleteUser(user.ID)">Delete Date</button></td>
 
                     </tr>
-                }
-            }
+                    }
+                
         </tbody>
     </table>
 }
@@ -124,6 +122,7 @@ else if (selectedDate == "Birthdays")
     private int userID;
     private string? userName;
     private DateTime userBirthDate = DateTime.Now;
+    private List<UserModel> userModels = new List<UserModel>();
 
     private void CreateUser()
     {
@@ -131,6 +130,13 @@ else if (selectedDate == "Birthdays")
             entityCrud.Create(userModel);
         else if (selectedOption == "crud")
             adoCrud.Create(userModel);
+    }
+    private void ReadUser()
+    {
+        if (selectedOption == "entity-framework")
+            userModels = entityCrud.Read(userModel);
+        else if (selectedOption == "crud")
+            userModels = adoCrud.Read(userModel);
     }
     private void UpdateUser()
     {
@@ -140,39 +146,20 @@ else if (selectedDate == "Birthdays")
             adoCrud.Update(userModel);
 
     }
-
-
-
-    private async Task DeleteUser(User Userdd)
+    private void DeleteUser(int id)
     {
-        GetBirthdays.Remove(Userdd);
-
-        BuildConnectionString nyCon = new BuildConnectionString();
-        string cstring = nyCon.ConnectionString;
-
-        using (SqlConnection connection = new SqlConnection(cstring))
-        {
-            connection.Open();
-
-            string sqlQuery = $"DELETE FROM Birthday WHERE ID = {Userdd.ID}";
-
-            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
-            {
-                int rowsAffected = command.ExecuteNonQuery();
-            }
-
-            connection.Close();
-            uriHelper.NavigateTo("/Holiday", true);
-        }
+        if (selectedOption == "entity-framework")
+            entityCrud.Delete(id);
+        else if (selectedOption == "crud")
+            adoCrud.Delete(id);
     }
+
 }
 
 @code {
     private PublicHoliday[] holidays = new PublicHoliday[0];
     private string selectedOption = "";
     private string selectedDate = "";
-    private List<User> birthdaysList = new List<User>(); // Rename the variable
-    List<User> GetBirthdays = new Holidata().GetBirthdays();
     private Holidata[]? Holidatas;
 
     protected override async Task OnInitializedAsync()
@@ -183,6 +170,7 @@ else if (selectedDate == "Birthdays")
     private void HandleSelection(ChangeEventArgs e)
     {
         selectedOption = e.Value.ToString();
+        ReadUser();
     }
 
     private void HandleSelection1(ChangeEventArgs e)

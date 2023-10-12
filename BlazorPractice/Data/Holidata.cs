@@ -24,42 +24,6 @@ namespace BlazorPractice.Data
             }
             return new PublicHoliday[0];
         }
-
-
-        public List<User> GetBirthdays()
-        {
-            BuildConnectionString nyCon = new BuildConnectionString();
-            string cstring = nyCon.ConnectionString;
-
-
-            List<User> ListUser = new List<User>();
-
-            using (SqlConnection con = new SqlConnection(cstring))
-            {
-                con.Open();
-
-                string sqlQuery2 = "SELECT * FROM Birthday";
-
-                using (SqlCommand command = new SqlCommand(sqlQuery2, con))
-                {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            User Userdd = new User
-                            {
-                                ID = Convert.ToInt32(reader["ID"]),
-                                Name1 = reader["Name1"].ToString(),
-                                Datecollum = (DateTime)reader["Datecollum"]
-                            };
-                            ListUser.Add(Userdd);
-                        }
-                    }
-                }
-                con.Close();
-            }
-            return ListUser;
-        }
     }
 
     public class PublicHoliday
@@ -67,22 +31,5 @@ namespace BlazorPractice.Data
         public DateTime? Date { get; set; }
         public string? LocalName { get; set; }
     }
-
-    public class User
-    {
-        public int ID { get; set; } 
-        public string?  Name1 { get; set; }
-        public DateTime Datecollum { get; set; }
-    }
-
-    public class AppDbContext : DbContext
-    {
-        public DbSet<User> Birthday { get; set; }
-
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
-    }
-    
 }
 

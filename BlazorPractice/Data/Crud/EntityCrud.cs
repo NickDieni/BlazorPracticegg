@@ -20,14 +20,20 @@ namespace BlazorPractice.Data.Crud
             _appDbContext.SaveChanges();
         }
 
-        public void Delete()
+        public void Delete(int user)
         {
-            throw new NotImplementedException();
+            var resultUser = _appDbContext.Birthday.Find(user);
+            if (resultUser != null)
+            {
+                _appDbContext.Birthday.Remove(resultUser);
+                _appDbContext.SaveChanges();
+            }
         }
 
-        public void Read()
+        public List<UserModel> Read(UserModel user)
         {
-            throw new NotImplementedException();
+            List<UserModel> userList = _appDbContext.Birthday.ToList();
+            return userList;
         }
 
         public void Update(UserModel user)

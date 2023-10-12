@@ -34,10 +34,6 @@ public class Program
         // Retrieve the connection string from configuration
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        builder.Services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseSqlServer(connectionString); // Use the connection string from configuration
-        });
         builder.Services.AddDbContext<ChatDbContext>(options =>
         {
             options.UseSqlServer(connectionString); // Use the connection string from configuration
