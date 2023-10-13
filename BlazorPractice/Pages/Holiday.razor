@@ -123,35 +123,40 @@ else if (selectedDate == "Birthdays")
     private string? userName;
     private DateTime userBirthDate = DateTime.Now;
     private List<UserModel> userModels = new List<UserModel>();
+    private ICrud currentCrudService;
+
+    private void SetCrudService()
+    {
+        if (selectedOption == "entity-framework")
+            currentCrudService = entityCrud;
+        else if (selectedOption == "crud")
+            currentCrudService = adoCrud;
+        else
+            throw new InvalidOperationException("Invalid selectedOption");
+    }
 
     private void CreateUser()
     {
-        if (selectedOption == "entity-framework")
-            entityCrud.Create(userModel);
-        else if (selectedOption == "crud")
-            adoCrud.Create(userModel);
+        SetCrudService();
+        currentCrudService.Create(userModel);
+        ReadUser();
     }
     private void ReadUser()
     {
-        if (selectedOption == "entity-framework")
-            userModels = entityCrud.Read(userModel);
-        else if (selectedOption == "crud")
-            userModels = adoCrud.Read(userModel);
+        SetCrudService();
+        userModels = currentCrudService.Read(userModel);
     }
     private void UpdateUser()
     {
-        if (selectedOption == "entity-framework")
-            entityCrud.Update(userModel);
-        else if (selectedOption == "crud")
-            adoCrud.Update(userModel);
-
+        SetCrudService();
+        currentCrudService.Update(userModel);
+        ReadUser();
     }
     private void DeleteUser(int id)
     {
-        if (selectedOption == "entity-framework")
-            entityCrud.Delete(id);
-        else if (selectedOption == "crud")
-            adoCrud.Delete(id);
+        SetCrudService();
+        currentCrudService.Delete(id);
+        ReadUser();
     }
 
 }
